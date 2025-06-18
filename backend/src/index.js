@@ -31,6 +31,14 @@ app.use(cors({
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
 
+        // In production, allow all HTTPS origins (more permissive for deployment)
+        if (process.env.NODE_ENV === 'production') {
+            if (origin && origin.startsWith('https://')) {
+                console.log('Allowing HTTPS origin:', origin);
+                return callback(null, true);
+            }
+        }
+
         // In development, allow any localhost origin
         if (process.env.NODE_ENV !== 'production') {
             if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
@@ -49,7 +57,9 @@ app.use(cors({
             'http://127.0.0.1:8080',
             'http://127.0.0.1:8081',
             'http://127.0.0.1:8082',
-            'https://crest-alumni-pwa.vercel.app/'
+            'https://crest-alumni-pwa.vercel.app',
+            'https://crest-alumni-pwa-git-main-jayasuryas-projects-ca21f6ac.vercel.app',
+            'https://crest-alumni-pwa-jayasuryas-projects-ca21f6ac.vercel.app'
         ];
 
         if (allowedOrigins.indexOf(origin) !== -1) {
