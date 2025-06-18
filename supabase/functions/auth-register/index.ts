@@ -21,13 +21,13 @@ serve(async (req) => {
     );
 
     // Check if email already exists
-    const { data: existingUser } = await supabaseClient
+    const { data: existingEmail } = await supabaseClient
       .from('alumni')
       .select('email')
       .eq('email', userData.email)
       .single();
 
-    if (existingUser) {
+    if (existingEmail) {
       return new Response(
         JSON.stringify({ success: false, message: 'Email already registered' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -48,16 +48,31 @@ serve(async (req) => {
       );
     }
 
-    // Hash password using bcrypt
-    const bcrypt = await import('https://deno.land/x/bcrypt@v0.4.1/mod.ts');
-    const hashedPassword = await bcrypt.hash(userData.password);
+    // Hash password using Web Crypto API (Deno compatible)
+    const encoder = new TextEncoder();
+    const data = encoder.encode(userData.password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashedPassword = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
     // Insert alumni data
     const { error } = await supabaseClient
       .from('alumni')
       .insert({
-        ...userData,
+        email: userData.email,
         password_hash: hashedPassword,
+        name: userData.name,
+        usn: userData.usn,
+        batch: userData.batch,
+        course: userData.course,
+        branch: userData.branch,
+        city: userData.city,
+        state: userData.state,
+        country: userData.country || 'India',
+        pincode: userData.pincode,
+        phone: userData.phone,
+        current_position: userData.currentPosition,
+        current_company: userData.currentCompany,
         is_approved: false
       });
 

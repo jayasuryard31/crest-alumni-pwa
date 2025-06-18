@@ -42,11 +42,14 @@ serve(async (req) => {
       );
     }
 
-    // Verify password using bcrypt
-    const bcrypt = await import('https://deno.land/x/bcrypt@v0.4.1/mod.ts');
-    const isValidPassword = await bcrypt.compare(password, alumni.password_hash);
+    // Hash the provided password and compare
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashedPassword = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-    if (!isValidPassword) {
+    if (hashedPassword !== alumni.password_hash) {
       return new Response(
         JSON.stringify({ success: false, message: 'Invalid email or password' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -59,7 +62,7 @@ serve(async (req) => {
       .update({ last_login: new Date().toISOString() })
       .eq('id', alumni.id);
 
-    // Create JWT token (simple implementation for demo)
+    // Create JWT token (simple implementation)
     const token = btoa(JSON.stringify({ 
       id: alumni.id, 
       email: alumni.email, 

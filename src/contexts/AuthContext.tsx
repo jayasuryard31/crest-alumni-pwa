@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -45,8 +44,8 @@ interface RegisterData {
   country: string;
   pincode: string;
   phone: string;
-  current_position?: string;
-  current_company?: string;
+  currentPosition?: string;
+  currentCompany?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -73,14 +72,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (token) {
         const tokenData = parseJWT(token);
         if (tokenData && tokenData.exp > Date.now()) {
-          const { data } = await supabase
-            .from('alumni')
-            .select('*')
-            .eq('id', tokenData.id)
-            .single();
+          const { data } = await supabase.functions.invoke('get-alumni-profile', {
+            body: { token }
+          });
           
-          if (data) {
-            setAlumni(data);
+          if (data?.success) {
+            setAlumni(data.alumni);
           }
         } else {
           localStorage.removeItem('alumni_token');

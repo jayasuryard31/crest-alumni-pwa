@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,8 +25,8 @@ const registrationSchema = z.object({
   state: z.string().min(1, 'Please select your state'),
   country: z.string().default('India'),
   pincode: z.string().regex(/^[1-9][0-9]{5}$/, 'Please enter a valid Indian pincode'),
-  current_position: z.string().optional(),
-  current_company: z.string().optional(),
+  currentPosition: z.string().optional(),
+  currentCompany: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -43,10 +42,51 @@ const courses = [
   'B.E/B.Tech', 'M.E/M.Tech', 'MBA', 'MCA', 'B.Sc', 'M.Sc', 'BCA', 'B.Com', 'M.Com', 'BBA', 'Other'
 ];
 
-const branches = [
-  'Computer Science', 'Information Technology', 'Electronics & Communication', 'Electrical', 
-  'Mechanical', 'Civil', 'Chemical', 'Biotechnology', 'Automobile', 'Aeronautical', 'Other'
-];
+const branchesByCourse: Record<string, string[]> = {
+  'B.E/B.Tech': [
+    'Computer Science Engineering', 'Information Technology', 'Electronics & Communication Engineering', 
+    'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering', 'Chemical Engineering', 
+    'Biotechnology Engineering', 'Automobile Engineering', 'Aeronautical Engineering'
+  ],
+  'M.E/M.Tech': [
+    'Computer Science Engineering', 'Information Technology', 'Electronics & Communication Engineering',
+    'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering', 'Chemical Engineering',
+    'Structural Engineering', 'Power Systems', 'VLSI Design'
+  ],
+  'MBA': [
+    'Finance', 'Marketing', 'Human Resources', 'Operations', 'Information Technology',
+    'International Business', 'Healthcare Management', 'Supply Chain Management'
+  ],
+  'MCA': [
+    'Software Development', 'Data Science', 'Cybersecurity', 'Mobile Application Development',
+    'Web Technologies', 'Artificial Intelligence'
+  ],
+  'B.Sc': [
+    'Computer Science', 'Information Technology', 'Physics', 'Chemistry', 'Mathematics',
+    'Biology', 'Biotechnology', 'Environmental Science', 'Statistics'
+  ],
+  'M.Sc': [
+    'Computer Science', 'Information Technology', 'Physics', 'Chemistry', 'Mathematics',
+    'Biology', 'Biotechnology', 'Environmental Science', 'Data Science'
+  ],
+  'BCA': [
+    'Software Development', 'Web Development', 'Mobile App Development', 'Database Management',
+    'Network Administration', 'Cybersecurity'
+  ],
+  'B.Com': [
+    'Accounting & Finance', 'Banking & Insurance', 'Taxation', 'E-Commerce',
+    'International Business', 'Corporate Secretaryship'
+  ],
+  'M.Com': [
+    'Accounting & Finance', 'Banking & Insurance', 'Taxation', 'International Business',
+    'Financial Markets', 'Business Analytics'
+  ],
+  'BBA': [
+    'Finance', 'Marketing', 'Human Resources', 'Operations', 'International Business',
+    'Digital Marketing', 'Event Management', 'Retail Management'
+  ],
+  'Other': ['General', 'Interdisciplinary', 'Custom Program']
+};
 
 const indianStates = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
@@ -58,6 +98,7 @@ const indianStates = [
 
 const RegistrationForm = ({ onSwitchToLogin }: RegistrationFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<string>('');
   const { register: registerUser } = useAuth();
   
   const {
@@ -66,6 +107,7 @@ const RegistrationForm = ({ onSwitchToLogin }: RegistrationFormProps) => {
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
@@ -73,17 +115,34 @@ const RegistrationForm = ({ onSwitchToLogin }: RegistrationFormProps) => {
     }
   });
 
+  const watchedCourse = watch('course');
+
+  React.useEffect(() => {
+    if (watchedCourse !== selectedCourse) {
+      setSelectedCourse(watchedCourse);
+      setValue('branch', ''); // Reset branch when course changes
+    }
+  }, [watchedCourse, selectedCourse, setValue]);
+
   const onSubmit = async (data: RegistrationFormData) => {
     setIsLoading(true);
     try {
       const { confirmPassword, ...submitData } = data;
-      const result = await registerUser(submitData);
+      // Map the form data to match the RegisterData interface
+      const mappedData = {
+        ...submitData,
+        currentPosition: data.currentPosition,
+        currentCompany: data.currentCompany
+      };
+      
+      const result = await registerUser(mappedData);
       
       if (result.success) {
         toast({
           title: "Registration Successful!",
           description: result.message,
         });
+        reset();
         onSwitchToLogin();
       } else {
         toast({
@@ -102,6 +161,8 @@ const RegistrationForm = ({ onSwitchToLogin }: RegistrationFormProps) => {
       setIsLoading(false);
     }
   };
+
+  const availableBranches = selectedCourse ? branchesByCourse[selectedCourse] || [] : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 py-8 px-4">
@@ -268,7 +329,10 @@ const RegistrationForm = ({ onSwitchToLogin }: RegistrationFormProps) => {
                     <Label htmlFor="course" className="text-sm font-medium text-gray-700">
                       Course *
                     </Label>
-                    <Select onValueChange={(value) => setValue('course', value)}>
+                    <Select onValueChange={(value) => {
+                      setValue('course', value);
+                      setValue('branch', ''); // Reset branch when course changes
+                    }}>
                       <SelectTrigger className="border-orange-200 focus:border-orange-500">
                         <SelectValue placeholder="Select course" />
                       </SelectTrigger>
@@ -285,12 +349,15 @@ const RegistrationForm = ({ onSwitchToLogin }: RegistrationFormProps) => {
                     <Label htmlFor="branch" className="text-sm font-medium text-gray-700">
                       Branch/Specialization *
                     </Label>
-                    <Select onValueChange={(value) => setValue('branch', value)}>
+                    <Select 
+                      onValueChange={(value) => setValue('branch', value)}
+                      disabled={!selectedCourse}
+                    >
                       <SelectTrigger className="border-orange-200 focus:border-orange-500">
-                        <SelectValue placeholder="Select branch" />
+                        <SelectValue placeholder={selectedCourse ? "Select branch" : "Select course first"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {branches.map((branch) => (
+                        {availableBranches.map((branch) => (
                           <SelectItem key={branch} value={branch}>{branch}</SelectItem>
                         ))}
                       </SelectContent>
@@ -372,29 +439,29 @@ const RegistrationForm = ({ onSwitchToLogin }: RegistrationFormProps) => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="current_position" className="text-sm font-medium text-gray-700">
+                    <Label htmlFor="currentPosition" className="text-sm font-medium text-gray-700">
                       Current Position
                     </Label>
                     <div className="relative">
                       <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
-                        id="current_position"
+                        id="currentPosition"
                         placeholder="e.g., Software Engineer"
                         className="pl-10 border-orange-200 focus:border-orange-500"
-                        {...register('current_position')}
+                        {...register('currentPosition')}
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="current_company" className="text-sm font-medium text-gray-700">
+                    <Label htmlFor="currentCompany" className="text-sm font-medium text-gray-700">
                       Current Company
                     </Label>
                     <Input
-                      id="current_company"
+                      id="currentCompany"
                       placeholder="e.g., Google, Microsoft"
                       className="border-orange-200 focus:border-orange-500"
-                      {...register('current_company')}
+                      {...register('currentCompany')}
                     />
                   </div>
                 </div>
