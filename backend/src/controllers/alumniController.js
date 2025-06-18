@@ -148,7 +148,6 @@ const getAllAlumni = async (req, res, next) => {
             where.OR = [
                 { name: { contains: search, mode: 'insensitive' } },
                 { email: { contains: search, mode: 'insensitive' } },
-                { usn: { contains: search, mode: 'insensitive' } },
             ];
         }
 
@@ -171,7 +170,6 @@ const getAllAlumni = async (req, res, next) => {
                     id: true,
                     email: true,
                     name: true,
-                    usn: true,
                     batch: true,
                     course: true,
                     branch: true,

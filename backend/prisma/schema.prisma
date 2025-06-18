@@ -12,7 +12,6 @@ model Alumni {
     email           String    @unique
     passwordHash    String    @map("password_hash")
     name            String
-    usn             String    @unique
     batch           String
     course          String
     branch          String

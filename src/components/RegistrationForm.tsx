@@ -16,7 +16,6 @@ const registrationSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
-  usn: z.string().min(5, 'USN must be at least 5 characters').max(20, 'USN too long'),
   phone: z.string().regex(/^[6-9][0-9]{9}$/, 'Please enter a valid Indian mobile number'),
   batch: z.string().min(4, 'Please enter your batch year'),
   course: z.string().min(1, 'Please select your course'),
@@ -128,14 +127,8 @@ const RegistrationForm = ({ onSwitchToLogin }: RegistrationFormProps) => {
     setIsLoading(true);
     try {
       const { confirmPassword, ...submitData } = data;
-      // Map the form data to match the RegisterData interface
-      const mappedData = {
-        ...submitData,
-        currentPosition: data.currentPosition,
-        currentCompany: data.currentCompany
-      };
       
-      const result = await registerUser(mappedData);
+      const result = await registerUser(submitData);
       
       if (result.success) {
         toast({
@@ -251,22 +244,6 @@ const RegistrationForm = ({ onSwitchToLogin }: RegistrationFormProps) => {
                       />
                     </div>
                     {errors.phone && <p className="text-xs text-red-600">{errors.phone.message}</p>}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="usn" className="text-sm font-medium text-gray-700">
-                      University Serial Number (USN) *
-                    </Label>
-                    <div className="relative">
-                      <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="usn"
-                        placeholder="e.g., 4AL18CS001"
-                        className="pl-10 border-orange-200 focus:border-orange-500"
-                        {...register('usn')}
-                      />
-                    </div>
-                    {errors.usn && <p className="text-xs text-red-600">{errors.usn.message}</p>}
                   </div>
                 </div>
 

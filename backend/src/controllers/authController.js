@@ -15,7 +15,6 @@ const registerSchema = z.object({
     email: z.string().email('Invalid email format'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
     name: z.string().min(2, 'Name must be at least 2 characters'),
-    usn: z.string().min(1, 'USN is required'),
     batch: z.string().min(1, 'Batch is required'),
     course: z.string().min(1, 'Course is required'),
     branch: z.string().min(1, 'Branch is required'),
@@ -100,14 +99,7 @@ const register = async (req, res, next) => {
             return next(createError('Email already registered', 409));
         }
 
-        // Check if USN already exists
-        const existingUSN = await prisma.alumni.findUnique({
-            where: { usn: data.usn },
-        });
 
-        if (existingUSN) {
-            return next(createError('USN already registered', 409));
-        }
 
         // Hash password
         const passwordHash = await hashPassword(data.password);
@@ -118,7 +110,6 @@ const register = async (req, res, next) => {
                 email: data.email,
                 passwordHash,
                 name: data.name,
-                usn: data.usn,
                 batch: data.batch,
                 course: data.course,
                 branch: data.branch,

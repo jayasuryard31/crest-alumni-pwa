@@ -109,10 +109,6 @@ const Dashboard = () => {
                   <p className="text-lg font-semibold text-gray-800">{alumni.name}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">University Serial Number</label>
-                  <p className="text-lg font-semibold text-gray-800">{alumni.usn}</p>
-                </div>
-                <div>
                   <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                     <Mail className="h-4 w-4" />
                     Email Address

@@ -5,7 +5,6 @@ interface Alumni {
   id: string;
   email: string;
   name: string;
-  usn: string;
   batch: string;
   course: string;
   branch: string;
@@ -35,7 +34,6 @@ interface RegisterData {
   email: string;
   password: string;
   name: string;
-  usn: string;
   batch: string;
   course: string;
   branch: string;
