@@ -1,5 +1,5 @@
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://alumni-connect-backend-4s87.onrender.com/api'
+  ? 'https://alumni-connect-backend-7u7e.onrender.com/api'
   : 'http://localhost:3001/api';
 
 interface ApiResponse<T = any> {
