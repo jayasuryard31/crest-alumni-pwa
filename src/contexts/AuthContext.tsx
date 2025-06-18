@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiClient } from '@/lib/apiClient';
 
 interface Alumni {
   id: string;
@@ -71,21 +71,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const token = localStorage.getItem('alumni_token');
       if (token) {
         const tokenData = parseJWT(token);
-        if (tokenData && tokenData.exp > Date.now()) {
-          const { data } = await supabase.functions.invoke('get-alumni-profile', {
-            body: { token }
-          });
+        if (tokenData && tokenData.exp > Date.now() / 1000) {
+          const response = await apiClient.getProfileByToken(token);
           
-          if (data?.success) {
-            setAlumni(data.alumni);
+          if (response.success) {
+            setAlumni(response.alumni as Alumni);
           }
         } else {
           localStorage.removeItem('alumni_token');
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Auth check failed:', error);
       localStorage.removeItem('alumni_token');
+      
+      // Don't show error for auth check failures on initial load
+      if (error.message?.includes('Network error')) {
+        console.warn('Backend server may not be running. Please start the backend server.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -101,41 +104,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const { data: functionResult, error } = await supabase.functions.invoke('auth-login', {
-        body: { email, password }
-      });
+      const response = await apiClient.login(email, password);
 
-      if (error) throw error;
-
-      if (functionResult.success) {
-        localStorage.setItem('alumni_token', functionResult.token);
-        setAlumni(functionResult.alumni);
+      if (response.success) {
+        localStorage.setItem('alumni_token', response.token!);
+        setAlumni(response.alumni as Alumni);
         return { success: true, message: 'Login successful!' };
       } else {
-        return { success: false, message: functionResult.message };
+        return { success: false, message: response.message || 'Login failed' };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
-      return { success: false, message: 'Login failed. Please try again.' };
+      return { success: false, message: error.message || 'Login failed. Please try again.' };
     }
   };
 
   const register = async (data: RegisterData) => {
     try {
-      const { data: functionResult, error } = await supabase.functions.invoke('auth-register', {
-        body: data
-      });
+      const response = await apiClient.register(data);
 
-      if (error) throw error;
-
-      if (functionResult.success) {
+      if (response.success) {
         return { success: true, message: 'Registration successful! Please wait for approval.' };
       } else {
-        return { success: false, message: functionResult.message };
+        return { success: false, message: response.message || 'Registration failed' };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration error:', error);
-      return { success: false, message: 'Registration failed. Please try again.' };
+      return { success: false, message: error.message || 'Registration failed. Please try again.' };
     }
   };
 

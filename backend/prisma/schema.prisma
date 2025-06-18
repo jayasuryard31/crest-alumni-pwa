@@ -1,0 +1,33 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Alumni {
+    id              String    @id @default(cuid())
+    email           String    @unique
+    passwordHash    String    @map("password_hash")
+    name            String
+    usn             String    @unique
+    batch           String
+    course          String
+    branch          String
+    city            String
+    state           String
+    country         String    @default("India")
+    pincode         String
+    phone           String
+    currentPosition String?   @map("current_position")
+    currentCompany  String?   @map("current_company")
+    profilePhotoUrl String?   @map("profile_photo_url")
+    isApproved      Boolean   @default(true) @map("is_approved")
+    createdAt       DateTime  @default(now()) @map("created_at")
+    updatedAt       DateTime  @updatedAt @map("updated_at")
+    lastLogin       DateTime? @map("last_login")
+
+    @@map("alumni")
+}
