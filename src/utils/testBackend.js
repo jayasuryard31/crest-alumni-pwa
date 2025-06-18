@@ -4,12 +4,12 @@ async function testBackendConnection() {
         console.log('Testing backend connection...');
 
         // Test health endpoint
-        const healthResponse = await fetch('/api/health');
+        const healthResponse = await fetch('https://alumni-connect-backend-4s87.onrender.com/api/health');
         const healthData = await healthResponse.json();
         console.log('Health check:', healthData);
 
         // Test CORS with a simple request
-        const corsResponse = await fetch('/api/health', {
+        const corsResponse = await fetch('https://alumni-connect-backend-4s87.onrender.com/api/health', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

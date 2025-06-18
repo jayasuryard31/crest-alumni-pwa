@@ -27,7 +27,7 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: function (origin, callback) {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
@@ -49,7 +49,10 @@ app.use(cors({
       'http://127.0.0.1:8080',
       'http://127.0.0.1:8081',
       'http://127.0.0.1:8082',
-      'https://your-production-domain.com'
+      'https://your-production-domain.com',
+      'https://alumni-connect-frontend.vercel.app',
+      'https://alumni-connect-frontend.netlify.app',
+      // Add any other domains where your frontend might be deployed
     ];
     
     if (allowedOrigins.indexOf(origin) !== -1) {
@@ -68,7 +71,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Handle preflight requests
-app.options('*', (req, res) => {
+app.options('*', (req: express.Request, res: express.Response) => {
   res.header('Access-Control-Allow-Origin', req.headers.origin);
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-client-info, apikey');
@@ -81,7 +84,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/alumni', alumniRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (req: express.Request, res: express.Response) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
@@ -89,7 +92,7 @@ app.get('/api/health', (req, res) => {
 app.use(errorHandler);
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use('*', (req: express.Request, res: express.Response) => {
   res.status(404).json({ error: 'Route not found' });
 });
 

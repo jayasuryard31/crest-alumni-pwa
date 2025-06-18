@@ -1,8 +1,8 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '../utils/auth';
 import { createError } from '../middleware/errorHandler';
-import { AuthRequest } from '../middleware/auth';
+import type { AuthRequest } from '../middleware/auth';
 
 const prisma = new PrismaClient();
 
@@ -37,7 +37,7 @@ export const getProfile = async (req: AuthRequest, res: Response, next: NextFunc
   }
 };
 
-export const getProfileByToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getProfileByToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { token } = req.body;
 
@@ -96,8 +96,8 @@ export const updateProfile = async (req: AuthRequest, res: Response, next: NextF
     
     // Only include allowed fields that are present in the request
     for (const field of allowedFields) {
-      if (req.body[field] !== undefined) {
-        updateData[field] = req.body[field];
+      if ((req.body as any)[field] !== undefined) {
+        updateData[field] = (req.body as any)[field];
       }
     }
 
@@ -134,7 +134,7 @@ export const updateProfile = async (req: AuthRequest, res: Response, next: NextF
 
 export const getAllAlumni = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { page = 1, limit = 10, search = '', batch = '', course = '', branch = '' } = req.query;
+    const { page = 1, limit = 10, search = '', batch = '', course = '', branch = '' } = req.query as any;
 
     const pageNum = parseInt(page as string);
     const limitNum = parseInt(limit as string);
