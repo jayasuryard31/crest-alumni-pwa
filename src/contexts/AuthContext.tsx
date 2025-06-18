@@ -19,6 +19,9 @@ interface Alumni {
   current_company?: string;
   profile_photo_url?: string;
   is_approved: boolean;
+  created_at?: string;
+  updated_at?: string;
+  last_login?: string;
 }
 
 interface AuthContextType {
@@ -68,14 +71,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const token = localStorage.getItem('alumni_token');
       if (token) {
-        const { data } = await supabase
-          .from('alumni')
-          .select('*')
-          .eq('id', parseJWT(token).id)
-          .single();
-        
-        if (data) {
-          setAlumni(data);
+        const tokenData = parseJWT(token);
+        if (tokenData && tokenData.exp > Date.now()) {
+          const { data } = await supabase
+            .from('alumni')
+            .select('*')
+            .eq('id', tokenData.id)
+            .single();
+          
+          if (data) {
+            setAlumni(data);
+          }
+        } else {
+          localStorage.removeItem('alumni_token');
         }
       }
     } catch (error) {
@@ -88,7 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const parseJWT = (token: string) => {
     try {
-      return JSON.parse(atob(token.split('.')[1]));
+      return JSON.parse(atob(token));
     } catch {
       return null;
     }

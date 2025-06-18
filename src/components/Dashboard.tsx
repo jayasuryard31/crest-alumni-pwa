@@ -1,288 +1,258 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, User, Mail, Phone, MapPin, GraduationCap, Briefcase, Calendar, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { User, MapPin, Phone, Mail, GraduationCap, Briefcase, Calendar, LogOut, School } from 'lucide-react';
 
 const Dashboard = () => {
   const { alumni, logout } = useAuth();
 
-  if (!alumni) return null;
+  if (!alumni) {
+    return null;
+  }
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Not available';
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
       {/* Header */}
-      <header className="bg-white shadow-lg border-b border-orange-100">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+      <div className="bg-white border-b border-orange-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-3">
               <img 
                 src="/lovable-uploads/bb8028a4-f5bb-4175-9319-caf1acbf4ea4.png" 
                 alt="ALVA's Education Foundation" 
                 className="h-12 w-12 object-contain"
               />
               <div>
-                <h1 className="text-xl font-bold text-gray-800">ALVA's Alumni Dashboard</h1>
-                <p className="text-sm text-gray-600">Welcome back, {alumni.name}!</p>
+                <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                  <School className="h-5 w-5 text-orange-600" />
+                  ALVA's Alumni Connect
+                </h1>
+                <p className="text-sm text-gray-600">Education Foundation</p>
               </div>
             </div>
             <Button
               onClick={logout}
               variant="outline"
-              className="text-gray-600 hover:text-red-600 border-gray-300 hover:border-red-300"
+              size="sm"
+              className="border-orange-200 text-orange-700 hover:bg-orange-50"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Logout
             </Button>
           </div>
         </div>
-      </header>
+      </div>
 
-      <main className="container mx-auto px-4 py-8">
-        {/* Status Message */}
-        {!alumni.is_approved && (
-          <div className="mb-6">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center space-x-3">
-              <AlertCircle className="h-5 w-5 text-yellow-600" />
-              <div>
-                <h3 className="font-medium text-yellow-800">Account Pending Approval</h3>
-                <p className="text-sm text-yellow-700">
-                  Your registration is under review. You'll be notified once approved by the admin.
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Section */}
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">
+            Welcome back, {alumni.name}!
+          </h2>
+          <p className="text-gray-600">
+            Your alumni profile and dashboard
+          </p>
+          <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-red-500 mx-auto mt-3 rounded-full"></div>
+        </div>
+
+        {/* Status Banner */}
+        <Card className="mb-8 border-orange-200 bg-gradient-to-r from-orange-50 to-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center space-x-4">
+              <div className="text-center">
+                <div className="text-4xl mb-2">🚧</div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  Application Under Development
+                </h3>
+                <p className="text-gray-700 max-w-2xl">
+                  We're working hard to bring you an amazing alumni experience! 
+                  New features and functionalities are being added regularly. 
+                  Thank you for your patience as we build something special for our alumni community.
                 </p>
+                <Badge variant="secondary" className="mt-3 bg-orange-100 text-orange-800">
+                  Coming Soon: Advanced Features
+                </Badge>
               </div>
             </div>
-          </div>
-        )}
+          </CardContent>
+        </Card>
 
-        {alumni.is_approved && (
-          <div className="mb-6">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-3">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <div>
-                <h3 className="font-medium text-green-800">Account Approved</h3>
-                <p className="text-sm text-green-700">
-                  Welcome to the ALVA's Alumni Community! Your profile is now active.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Building Message */}
-        <div className="mb-8">
-          <Card className="border-dashed border-2 border-orange-300 bg-gradient-to-r from-orange-100 to-red-100">
-            <CardContent className="text-center py-12">
-              <div className="space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                    <GraduationCap className="h-8 w-8 text-white" />
-                  </div>
+        {/* Profile Information */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Personal Information */}
+          <Card className="lg:col-span-2 border-orange-200 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-t-lg">
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Personal Information
+              </CardTitle>
+              <CardDescription className="text-orange-100">
+                Your basic profile details
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Full Name</label>
+                  <p className="text-lg font-semibold text-gray-800">{alumni.name}</p>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800">
-                  🎉 The Application is in Building Phase! 🎉
-                </h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  We're working hard to bring you amazing features. Stay tuned for the big surprise coming your way!
-                </p>
-                <div className="flex justify-center">
-                  <Badge variant="secondary" className="bg-orange-200 text-orange-800 px-4 py-2">
-                    Coming Soon: Alumni Directory, Events, Job Portal & More!
-                  </Badge>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">University Serial Number</label>
+                  <p className="text-lg font-semibold text-gray-800">{alumni.usn}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                    <Mail className="h-4 w-4" />
+                    Email Address
+                  </label>
+                  <p className="text-lg font-semibold text-gray-800">{alumni.email}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                    <Phone className="h-4 w-4" />
+                    Phone Number
+                  </label>
+                  <p className="text-lg font-semibold text-gray-800">+91 {alumni.phone}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Profile Information */}
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Personal Information */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5 text-orange-600" />
-                Personal Information
-              </CardTitle>
+          {/* Status Card */}
+          <Card className="border-orange-200 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-t-lg">
+              <CardTitle className="text-lg">Account Status</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <User className="h-4 w-4 text-gray-400" />
+            <CardContent className="p-6">
+              <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-gray-500">Full Name</p>
-                  <p className="font-medium">{alumni.name}</p>
+                  <label className="text-sm font-medium text-gray-600">Approval Status</label>
+                  <div className="mt-1">
+                    {alumni.is_approved ? (
+                      <Badge className="bg-green-100 text-green-800">Approved</Badge>
+                    ) : (
+                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                        Pending Approval
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Mail className="h-4 w-4 text-gray-400" />
                 <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium">{alumni.email}</p>
+                  <label className="text-sm font-medium text-gray-600">Member Since</label>
+                  <p className="text-sm text-gray-800">{formatDate(alumni.created_at)}</p>
                 </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="h-4 w-4 text-gray-400" />
                 <div>
-                  <p className="text-sm text-gray-500">Phone</p>
-                  <p className="font-medium">{alumni.phone}</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <GraduationCap className="h-4 w-4 text-gray-400" />
-                <div>
-                  <p className="text-sm text-gray-500">USN</p>
-                  <p className="font-medium">{alumni.usn}</p>
+                  <label className="text-sm font-medium text-gray-600">Last Login</label>
+                  <p className="text-sm text-gray-800">
+                    {alumni.last_login ? formatDate(alumni.last_login) : 'First time login'}
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Academic Information */}
-          <Card className="shadow-lg">
-            <CardHeader>
+          <Card className="border-orange-200 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
-                <GraduationCap className="h-5 w-5 text-orange-600" />
+                <GraduationCap className="h-5 w-5" />
                 Academic Details
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <Calendar className="h-4 w-4 text-gray-400" />
+            <CardContent className="p-6">
+              <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-gray-500">Batch</p>
-                  <p className="font-medium">{alumni.batch}</p>
+                  <label className="text-sm font-medium text-gray-600">Batch</label>
+                  <p className="text-lg font-semibold text-gray-800">{alumni.batch}</p>
                 </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <GraduationCap className="h-4 w-4 text-gray-400" />
                 <div>
-                  <p className="text-sm text-gray-500">Course</p>
-                  <p className="font-medium">{alumni.course}</p>
+                  <label className="text-sm font-medium text-gray-600">Course</label>
+                  <p className="text-lg font-semibold text-gray-800">{alumni.course}</p>
                 </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <GraduationCap className="h-4 w-4 text-gray-400" />
                 <div>
-                  <p className="text-sm text-gray-500">Branch</p>
-                  <p className="font-medium">{alumni.branch}</p>
+                  <label className="text-sm font-medium text-gray-600">Branch</label>
+                  <p className="text-lg font-semibold text-gray-800">{alumni.branch}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Location Information */}
-          <Card className="shadow-lg">
-            <CardHeader>
+          <Card className="border-orange-200 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-orange-600" />
+                <MapPin className="h-5 w-5" />
                 Location Details
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <MapPin className="h-4 w-4 text-gray-400" />
+            <CardContent className="p-6">
+              <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-gray-500">City</p>
-                  <p className="font-medium">{alumni.city}</p>
+                  <label className="text-sm font-medium text-gray-600">City</label>
+                  <p className="text-lg font-semibold text-gray-800">{alumni.city}</p>
                 </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <MapPin className="h-4 w-4 text-gray-400" />
                 <div>
-                  <p className="text-sm text-gray-500">State</p>
-                  <p className="font-medium">{alumni.state}</p>
+                  <label className="text-sm font-medium text-gray-600">State</label>
+                  <p className="text-lg font-semibold text-gray-800">{alumni.state}</p>
                 </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <MapPin className="h-4 w-4 text-gray-400" />
                 <div>
-                  <p className="text-sm text-gray-500">Country</p>
-                  <p className="font-medium">{alumni.country}</p>
+                  <label className="text-sm font-medium text-gray-600">Country</label>
+                  <p className="text-lg font-semibold text-gray-800">{alumni.country}</p>
                 </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <MapPin className="h-4 w-4 text-gray-400" />
                 <div>
-                  <p className="text-sm text-gray-500">Pincode</p>
-                  <p className="font-medium">{alumni.pincode}</p>
+                  <label className="text-sm font-medium text-gray-600">Pincode</label>
+                  <p className="text-lg font-semibold text-gray-800">{alumni.pincode}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Professional Information */}
-          <Card className="shadow-lg">
-            <CardHeader>
+          <Card className="border-orange-200 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-orange-600" />
+                <Briefcase className="h-5 w-5" />
                 Professional Details
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {alumni.current_position || alumni.current_company ? (
-                <>
-                  {alumni.current_position && (
-                    <div className="flex items-center space-x-3">
-                      <Briefcase className="h-4 w-4 text-gray-400" />
-                      <div>
-                        <p className="text-sm text-gray-500">Current Position</p>
-                        <p className="font-medium">{alumni.current_position}</p>
-                      </div>
-                    </div>
-                  )}
-                  {alumni.current_company && (
-                    <div className="flex items-center space-x-3">
-                      <Briefcase className="h-4 w-4 text-gray-400" />
-                      <div>
-                        <p className="text-sm text-gray-500">Current Company</p>
-                        <p className="font-medium">{alumni.current_company}</p>
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <p className="text-gray-500 italic">No professional information provided</p>
-              )}
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Current Position</label>
+                  <p className="text-lg font-semibold text-gray-800">
+                    {alumni.current_position || 'Not specified'}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Current Company</label>
+                  <p className="text-lg font-semibold text-gray-800">
+                    {alumni.current_company || 'Not specified'}
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Account Status */}
-        <div className="mt-6">
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-orange-600" />
-                Account Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Registration Status</p>
-                  <p className="text-sm text-gray-500">
-                    Registered on {new Date(alumni.created_at).toLocaleDateString('en-IN')}
-                  </p>
-                </div>
-                <Badge 
-                  variant={alumni.is_approved ? "default" : "secondary"}
-                  className={alumni.is_approved ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}
-                >
-                  {alumni.is_approved ? "Approved" : "Pending Approval"}
-                </Badge>
-              </div>
-              {alumni.last_login && (
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-sm text-gray-500">
-                    Last login: {new Date(alumni.last_login).toLocaleString('en-IN')}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+        {/* Footer */}
+        <div className="mt-12 text-center">
+          <p className="text-sm text-gray-500">
+            © 2024 ALVA's Education Foundation. All rights reserved.
+          </p>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
