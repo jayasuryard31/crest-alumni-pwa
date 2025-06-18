@@ -1,6 +1,6 @@
-import { Router } from 'express';
-import { getProfile, getProfileByToken, updateProfile, getAllAlumni } from '../controllers/alumniController';
-import { authenticateToken } from '../middleware/auth';
+const { Router } = require('express');
+const { getProfile, getProfileByToken, updateProfile, getAllAlumni } = require('../controllers/alumniController');
+const { authenticateToken } = require('../middleware/auth');
 
 const router = Router();
 
@@ -19,4 +19,4 @@ router.put('/profile', updateProfile);
 // GET /api/alumni/all
 router.get('/all', getAllAlumni);
 
-export default router;
+module.exports = router;
