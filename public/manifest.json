@@ -1,0 +1,28 @@
+
+{
+  "name": "ALVA's Alumni - Education Foundation",
+  "short_name": "ALVA's Alumni",
+  "description": "Alumni Detail Collector for ALVA's Education Foundation",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f97316",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/lovable-uploads/bb8028a4-f5bb-4175-9319-caf1acbf4ea4.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/bb8028a4-f5bb-4175-9319-caf1acbf4ea4.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "social"],
+  "lang": "en",
+  "dir": "ltr"
+}
